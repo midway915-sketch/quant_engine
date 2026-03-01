@@ -1,0 +1,7 @@
+
+regime.ma_fast: [150, 180]
+regime.vol_spike: [0.25, 0.30]
+
+risk_off.mode: [SHY_100, SHY_GLD_50_50, SHY_70_GLD_30]
+
+leverage.strong: [2.0, 3.0]
