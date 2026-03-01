@@ -1,13 +1,9 @@
 
-regime:
-  vol_spike: [0.25, 0.3]
+regime.vol_spike: [0.25, 0.3]
 
-selection:
-  top_n: [1, 2]
+selection.top_n: [1, 2]
 
-risk_off:
-  mode: ["SHY_100", "SHY_70_GLD_30", "SHY_GLD_50_50"]
+risk_off.mode: ["SHY_100", "SHY_70_GLD_30", "SHY_GLD_50_50"]
 
-leverage:
-  strong: [3.0, 3.5, 4.0]
-  weak: [1.0]
+leverage.strong: [3.0, 3.5, 4.0]
+leverage.weak: [1.0]
