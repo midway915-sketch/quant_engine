@@ -1,0 +1,44 @@
+{
+  "engine_version": "v4",
+  "research_stage": "risk_off_optimization",
+
+  "backtest_period": {
+    "start": "2000-01-01",
+    "end": "present"
+  },
+
+  "regime": {
+    "vol_spike": 0.25,
+    "description": "Volatility spike filter active"
+  },
+
+  "leverage": {
+    "strong": 3.0,
+    "weak": 1.0,
+    "notes": "2.0 underperforms, 3.0 best so far"
+  },
+
+  "risk_off": {
+    "mode": "SHY_100",
+    "tested_modes": [
+      "SHY_100",
+      "SHY_GLD_50_50",
+      "SHY_70_GLD_30"
+    ]
+  },
+
+  "baseline": {
+    "qqq_cagr": 0.18,
+    "qqq_mdd": -0.55
+  },
+
+  "latest_best_result": {
+    "cagr": 0.7196,
+    "mdd": -0.29,
+    "params": {
+      "vol_spike": 0.25,
+      "leverage_strong": 3.0,
+      "risk_off_mode": "SHY_100"
+    }
+  }
+}
