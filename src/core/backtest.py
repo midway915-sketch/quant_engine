@@ -54,36 +54,61 @@ def apply_risk_off(mode):
 def run(cfg):
     prices = download(cfg)
 
-    returns = prices.pct_change().fillna(0)
+    returns = prices.pct_change()
 
     if returns.empty:
         raise ValueError("Returns dataframe is empty.")
 
-    ranks = momentum_rank(prices)
-    regime = compute_regime(prices.iloc[:, 0], cfg)
+    # 🔹 모멘텀 랭킹 (하루 밀기)
+    ranks = momentum_rank(prices).shift(1)
+
+    # 🔹 레짐 신호 (하루 밀기)
+    regime = compute_regime(prices.iloc[:, 0], cfg).shift(1)
 
     equity = 1.0
     curve = []
 
     for date in prices.index:
+
+        # 첫날은 신호 없음
+        if date not in regime.index or pd.isna(regime.loc[date]):
+            curve.append(equity)
+            continue
+
         state = regime.loc[date]
+
+        # 해당 날짜 수익
+        if date not in returns.index:
+            curve.append(equity)
+            continue
 
         if state == "RISK_OFF":
             weights = apply_risk_off(cfg["risk_off"]["mode"])
             daily_ret = 0.0
+
             for t, w in weights.items():
                 if t in returns.columns:
                     daily_ret += returns.loc[date, t] * w
+
         else:
+            if date not in ranks.index or ranks.loc[date].isna().all():
+                curve.append(equity)
+                continue
+
             top = ranks.loc[date].nsmallest(cfg["selection"]["top_n"]).index
+
             lev = (
                 cfg["leverage"]["strong"]
                 if state == "STRONG"
                 else cfg["leverage"]["weak"]
             )
+
             daily_ret = returns.loc[date, top].mean() * lev
 
-        equity *= (1 + (daily_ret if pd.notna(daily_ret) else 0))
+        if pd.isna(daily_ret):
+            daily_ret = 0.0
+
+        equity *= (1 + daily_ret)
         curve.append(equity)
 
     if len(curve) == 0:
