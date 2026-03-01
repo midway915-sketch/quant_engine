@@ -1,7 +1,13 @@
 
-regime.ma_fast: [150, 180]
-regime.vol_spike: [0.25, 0.30]
+regime:
+  vol_spike: [0.25, 0.3]
 
-risk_off.mode: [SHY_100, SHY_GLD_50_50, SHY_70_GLD_30]
+selection:
+  top_n: [1, 2]
 
-leverage.strong: [2.0, 3.0]
+risk_off:
+  mode: ["SHY_100", "SHY_70_GLD_30", "SHY_GLD_50_50"]
+
+leverage:
+  strong: [3.0, 3.5, 4.0]
+  weak: [1.0]
