@@ -1,6 +1,6 @@
 
 data:
-  tickers: ["QQQ","SPY","TLT","GLD"]
+  tickers: ["QQQ","SPY","TLT","GLD","SHY"]
   start: "2000-01-01"
 
 regime:
