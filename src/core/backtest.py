@@ -12,21 +12,25 @@ def download(cfg):
         progress=False
     )
 
-    # 🔥 yfinance 최신 구조 대응
+    if df.empty:
+        raise ValueError("Downloaded price data is empty.")
+
     if isinstance(df.columns, pd.MultiIndex):
-        # MultiIndex 케이스 (멀티 티커)
         if "Adj Close" in df.columns.levels[0]:
             df = df["Adj Close"]
         else:
             df = df["Close"]
     else:
-        # 단일 티커 케이스
         if "Adj Close" in df.columns:
             df = df[["Adj Close"]]
         else:
             df = df[["Close"]]
 
     df = df.dropna()
+
+    if df.empty:
+        raise ValueError("Price data empty after cleaning.")
+
     return df
 
 
@@ -50,10 +54,13 @@ def apply_risk_off(mode):
 def run(cfg):
     prices = download(cfg)
 
+    returns = prices.pct_change().fillna(0)
+
+    if returns.empty:
+        raise ValueError("Returns dataframe is empty.")
+
     ranks = momentum_rank(prices)
     regime = compute_regime(prices.iloc[:, 0], cfg)
-
-    returns = prices.pct_change().fillna(0)
 
     equity = 1.0
     curve = []
@@ -67,7 +74,6 @@ def run(cfg):
             for t, w in weights.items():
                 if t in returns.columns:
                     daily_ret += returns.loc[date, t] * w
-
         else:
             top = ranks.loc[date].nsmallest(cfg["selection"]["top_n"]).index
             lev = (
@@ -79,5 +85,8 @@ def run(cfg):
 
         equity *= (1 + (daily_ret if pd.notna(daily_ret) else 0))
         curve.append(equity)
+
+    if len(curve) == 0:
+        raise ValueError("Equity curve is empty.")
 
     return pd.Series(curve, index=prices.index)
