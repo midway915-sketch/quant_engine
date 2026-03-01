@@ -1,4 +1,4 @@
-name: run-grid
+name: grid-run-with-state
 
 on:
   workflow_dispatch:
@@ -6,6 +6,8 @@ on:
 jobs:
   run:
     runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: "1"
 
     steps:
       - name: Checkout
@@ -21,20 +23,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      # 🔥 핵심: src 모듈 인식시키기
       - name: Set PYTHONPATH
         run: echo "PYTHONPATH=$GITHUB_WORKSPACE" >> $GITHUB_ENV
 
-      - name: Run grid
+      - name: Run Grid
         run: |
           python scripts/run_grid.py \
             --config config/default.yml \
             --grid config/grid.yml \
             --out out
 
-      - name: Upload results
+      - name: Upload artifacts
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: grid-results
-          path: out/summary.csv
           if-no-files-found: error
+          path: |
+            STATE.json
+            out/summary.csv
